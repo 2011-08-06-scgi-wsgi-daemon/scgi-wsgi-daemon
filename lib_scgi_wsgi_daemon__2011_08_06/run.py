@@ -73,10 +73,12 @@ def run(app,
     else:
         main_loop = None
     
-    start_scgi_wsgi_server(loop_idle, app, socket,
+    server = ScgiWsgiServer(loop_idle, app, socket,
             inactive_guard=inactive_guard,
             inactive_quit_time=inactive_quit_time,
             loop_quit=loop_quit)
+    
+    server.start()
     
     if main_loop is not None:
         main_loop.run()
