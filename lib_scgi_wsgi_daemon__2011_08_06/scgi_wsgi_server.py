@@ -19,6 +19,8 @@ from __future__ import absolute_import
 assert unicode is not str
 
 class ScgiWsgiServer(object):
+    UPLOAD_CONTENT_LENGTH_LIMIT = 2000000
+    
     def __init__(self, loop_idle, app, socket,
             inactive_guard=None,
             inactive_quit_time=None,
@@ -44,6 +46,14 @@ class ScgiWsgiServer(object):
         if self._inactive_guard is not None:
             self._inactive_guard.event()
     
+    def _format_scgi_error_response(self, text):
+        data = '500 Internal Server Error\r\n' \
+                'Content-Type: text/plain;charset=utf-8\r\n' \
+                '\r\n' \
+                text.encode('utf-8', 'replace')
+        
+        return data
+    
     def _conn_daemon(self, conn, address):
         fd = None
         try:
@@ -66,13 +76,41 @@ class ScgiWsgiServer(object):
             assert all_size_str is not None
             all_size = int(all_size_str)
             
-            buf = fd.read(all_size)
-            assert len(buf) == all_size
+            headers_buf = fd.read(all_size)
+            assert len(headers_buf) == all_size
+            headers_sep = fd.read(1)
+            assert headers_sep == ','
+            
+            environ_list = headers_buf.split('\0')[:-1]
+            environ = {}
+            while environ_list:
+                key = environ_list.pop(0)
+                value = environ_list.pop(0)
+                environ['HTTP_' + key] = value
+            content_length = int(environ['HTTP_CONTENT_LENGTH'])
+            
+            if content_length <= self.UPLOAD_CONTENT_LENGTH_LIMIT:
+                upload_content = fd.read(content_length)
+            else:
+                error_text = u'Error: Upload too large'
+                error_data = self._format_scgi_error_response(error_text)
+                
+                fd.write(error_data)
+                
+                return
             
             # TODO: ...
             
             # TODO: и не забыть делать self.loop_idle(self._inactive_guard_event)
             #           при каждом полученном блоке данных ОТ wsgi-приложения
+        except:
+            if fd:
+                from traceback import format_exc
+                
+                error_text = unicode(format_exc())
+                error_data = self._format_scgi_error_response(error_text)
+                
+                fd.write(error_data)
         finally:
             if fd is not None:
                 fd.close()
