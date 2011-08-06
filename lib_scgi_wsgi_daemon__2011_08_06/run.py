@@ -30,7 +30,7 @@ def run(app,
             loop_idle=None
             loop_quit=None,
         ):
-    from .scgi_wsgi_server import run_scgi_wsgi_server
+    from .scgi_wsgi_server import ScgiWsgiServer
     
     assert socket is not None or socket_path is not None
     
