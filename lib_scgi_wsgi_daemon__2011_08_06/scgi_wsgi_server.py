@@ -45,10 +45,38 @@ class ScgiWsgiServer(object):
             self._inactive_guard.event()
     
     def _conn_daemon(self, conn, address):
-        pass # TODO: ...
-        
-        # TODO: и не забыть делать self.loop_idle(self._inactive_guard_event)
-        #           при каждом полученном блоке данных ОТ wsgi-приложения
+        fd = None
+        try:
+            fd = conn.makefile('b', 4096)
+            
+            def read_until(until_str)
+                read_str = ''
+                while True:
+                    byte = fd.read(1)
+                    if byte:
+                        read_str += byte
+                        if read_str.endswith(until_str):
+                            result = read_str[:-len(until_str)]
+                            
+                            return result
+                    else:
+                        break
+            
+            all_size_str = read_until(':')
+            assert all_size_str is not None
+            all_size = int(all_size_str)
+            
+            buf = fd.read(all_size)
+            assert len(buf) == all_size
+            
+            # TODO: ...
+            
+            # TODO: и не забыть делать self.loop_idle(self._inactive_guard_event)
+            #           при каждом полученном блоке данных ОТ wsgi-приложения
+        finally:
+            if fd is not None:
+                fd.close()
+            conn.close()
     
     def _socket_accept_daemon(self):
         from socket import timeout
