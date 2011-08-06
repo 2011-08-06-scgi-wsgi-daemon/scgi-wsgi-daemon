@@ -47,8 +47,8 @@ class ScgiWsgiServer(object):
     def _conn_daemon(self, conn, address):
         pass # TODO: ...
         
-        # TODO: и незабыть делать self.loop_idle(self._inactive_guard_event)
-        #           при каждом полученном блоке данных
+        # TODO: и не забыть делать self.loop_idle(self._inactive_guard_event)
+        #           при каждом полученном блоке данных ОТ wsgi-приложения
     
     def _socket_accept_daemon(self):
         from socket import timeout
