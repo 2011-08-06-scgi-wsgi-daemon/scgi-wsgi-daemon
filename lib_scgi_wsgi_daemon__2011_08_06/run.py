@@ -25,6 +25,7 @@ def run(app,
             pid_path=None,
             socket_backlog=None,
             use_daemonize=None,
+            inactive_guard=None,
             inactive_quit_time=None,
             loop_idle=None
             loop_quit=None,
@@ -73,6 +74,7 @@ def run(app,
         main_loop = None
     
     loop_idle(run_scgi_wsgi_server, loop_idle, app, socket,
+            inactive_guard=inactive_guard,
             inactive_quit_time=inactive_quit_time,
             loop_quit=loop_quit)
     
