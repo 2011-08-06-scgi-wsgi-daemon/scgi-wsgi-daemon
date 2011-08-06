@@ -1,0 +1,23 @@
+#!/usr/bin/env python
+# -*- mode: python; coding: utf-8 -*-
+
+from __future__ import absolute_import
+assert unicode is not str
+
+def app(environ, start_response):
+    start_response('200 OK', (('Content-Type', 'text/plain;charset=utf-8'),))
+    
+    text = u'Hello world!\n'
+    data = text.encode('utf-8', 'replace')
+    
+    return data,
+
+if __name__ == '__main__':
+    from os.path import dirname, join
+    from scgi_wsgi_daemon import run
+    
+    run(app,
+            socket_path=join(dirname(__file__), 'test-site', 'scgi.sock'),
+            lock_path=join(dirname(__file__), 'test-site', 'scgi.lock')
+            pid_path=join(dirname(__file__), 'test-site', 'scgi.pid')
+            use_daemonize=True)
