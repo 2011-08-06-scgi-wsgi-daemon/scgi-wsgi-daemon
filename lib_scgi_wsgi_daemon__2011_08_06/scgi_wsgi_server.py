@@ -47,7 +47,7 @@ class ScgiWsgiServer(object):
     def _conn_daemon(self, conn, address):
         fd = None
         try:
-            fd = conn.makefile('b', 4096)
+            fd = conn.makefile('b')
             
             def read_until(until_str)
                 read_str = ''
