@@ -34,15 +34,14 @@ class InactiveGuard(object):
             loop_idle(self._timeout)
     
     def _timeout(self):
-        if self._is_started:
-            from time import time
-            from .daemon import start_daemon
-            
-            if abs(time() - self._time) < self._quit_time_len:
-                start_daemon(loop_idle, self._sleep_daemon)
-            else:
-                self.stop()
-                self._loop_quit()
+        from time import time
+        from .daemon import start_daemon
+        
+        if abs(time() - self._time) < self._quit_time_len:
+            start_daemon(loop_idle, self._sleep_daemon)
+        else:
+            self.stop()
+            self._loop_quit()
     
     def event(self):
         from time import time
