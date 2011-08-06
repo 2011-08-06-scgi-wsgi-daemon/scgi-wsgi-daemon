@@ -27,21 +27,21 @@ class InactiveGuard(object):
         self._is_started = False
     
     def _sleep_daemon(self):
-        if self._is_started:
-            from time import sleep
-            
-            sleep(self._quit_time_len / 10.0)
-            loop_idle(self._timeout)
+        from time import sleep
+        
+        sleep(self._quit_time_len / 10.0)
+        loop_idle(self._timeout)
     
     def _timeout(self):
-        from time import time
-        from .daemon import start_daemon
-        
-        if abs(time() - self._time) < self._quit_time_len:
-            start_daemon(loop_idle, self._sleep_daemon)
-        else:
-            self.stop()
-            self._loop_quit()
+        if self._is_started:
+            from time import time
+            from .daemon import start_daemon
+            
+            if abs(time() - self._time) < self._quit_time_len:
+                start_daemon(loop_idle, self._sleep_daemon)
+            else:
+                self.stop()
+                self._loop_quit()
     
     def event(self):
         from time import time
