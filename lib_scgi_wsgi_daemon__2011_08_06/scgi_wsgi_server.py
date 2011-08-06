@@ -40,13 +40,20 @@ class ScgiWsgiServer(object):
         self._inactive_guard = inactive_guard
         self._is_started = False
     
+    def _inactive_guard_event(self):
+        if self._inactive_guard is not None:
+            self._inactive_guard.event()
+    
     def _conn_daemon(self, conn, address):
         pass # TODO: ...
+        
+        # TODO: и незабыть делать self.loop_idle(self._inactive_guard_event)
+        #           при каждом полученном блоке данных
     
     def _socket_accept_daemon(self):
         from socket import timeout
         
-        self._socket.settimeout(10.0)
+        self._socket.settimeout(30.0)
         try:
             conn, address = self._socket.accept()
         except timeout:
@@ -59,6 +66,8 @@ class ScgiWsgiServer(object):
             from .daemon import start_daemon
             
             if accept_result is not None:
+                self._inactive_guard_event()
+                
                 conn, address = accept_result
                 start_daemon(self.loop_idle, self._conn_daemon, conn, address)
             
