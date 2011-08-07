@@ -34,7 +34,8 @@ class ScgiWsgiServer(object):
         if inactive_guard is None and inactive_quit_time is not None:
             from .inactive_guard import InactiveGuard
             
-            inactive_guard = InactiveGuard(loop_idle, loop_quit, inactive_quit_time)
+            inactive_guard = InactiveGuard(
+                    loop_idle, loop_quit, inactive_quit_time)
             
         self._loop_idle = loop_idle
         self._app = app
