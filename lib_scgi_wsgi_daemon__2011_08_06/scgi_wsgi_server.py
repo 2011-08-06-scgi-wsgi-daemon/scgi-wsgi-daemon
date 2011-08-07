@@ -103,9 +103,6 @@ class ScgiWsgiServer(object):
                 return
             
             # TODO: ...
-            
-            # TODO: и не забыть делать self.loop_idle(self._inactive_guard_event)
-            #           при каждом полученном блоке данных ОТ wsgi-приложения
         except:
             if fd:
                 from traceback import format_exc
@@ -118,6 +115,7 @@ class ScgiWsgiServer(object):
             if fd is not None:
                 fd.close()
             conn.close()
+            self.loop_idle(self._inactive_guard_event)
     
     def _socket_accept_daemon(self):
         from socket import timeout
