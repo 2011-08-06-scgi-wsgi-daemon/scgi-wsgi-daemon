@@ -114,8 +114,7 @@ class ScgiWsgiServer(object):
                 fd.write(error_data)
         finally:
             if fd is not None:
-                fd.close()
-            conn.close()
+                fd.flush()
     
     def _socket_accept_daemon(self):
         from socket import timeout
