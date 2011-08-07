@@ -100,6 +100,7 @@ class ScgiWsgiServer(object):
                 error_data = self._format_scgi_error_response(error_text)
                 
                 fd.write(error_data)
+                fd.flush()
                 
                 return
             
@@ -112,8 +113,6 @@ class ScgiWsgiServer(object):
                 error_data = self._format_scgi_error_response(error_text)
                 
                 fd.write(error_data)
-        finally:
-            if fd is not None:
                 fd.flush()
     
     def _socket_accept_daemon(self):
