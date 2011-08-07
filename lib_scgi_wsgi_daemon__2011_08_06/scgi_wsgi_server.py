@@ -64,6 +64,7 @@ class ScgiWsgiServer(object):
             
             def read_until(until_str)
                 read_str = ''
+                
                 while True:
                     byte = fd.read(1)
                     if byte:
