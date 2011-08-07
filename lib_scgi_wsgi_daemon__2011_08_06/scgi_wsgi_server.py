@@ -18,8 +18,10 @@
 from __future__ import absolute_import
 assert unicode is not str
 
+UPLOAD_CONTENT_LENGTH_LIMIT = 2000000
+
 class ScgiWsgiServer(object):
-    UPLOAD_CONTENT_LENGTH_LIMIT = 2000000
+    _UPLOAD_CONTENT_LENGTH_LIMIT = UPLOAD_CONTENT_LENGTH_LIMIT
     
     def __init__(self, loop_idle, app, socket,
             inactive_guard=None,
@@ -90,7 +92,7 @@ class ScgiWsgiServer(object):
                 environ['HTTP_' + key] = value
             content_length = int(environ['HTTP_CONTENT_LENGTH'])
             
-            if content_length <= self.UPLOAD_CONTENT_LENGTH_LIMIT:
+            if content_length <= self._UPLOAD_CONTENT_LENGTH_LIMIT:
                 upload_content = fd.read(content_length)
             else:
                 error_text = u'Error: Upload too large'
