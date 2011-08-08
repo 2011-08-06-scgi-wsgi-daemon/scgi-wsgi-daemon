@@ -18,7 +18,7 @@
 from __future__ import absolute_import
 assert unicode is not str
 
-write_pid(path):
+def write_pid(path):
     from os import remove, getpid
     from fcntl import flock, LOCK_EX
     
