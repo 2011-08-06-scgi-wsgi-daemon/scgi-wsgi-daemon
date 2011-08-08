@@ -19,12 +19,16 @@ from __future__ import absolute_import
 assert unicode is not str
 
 def new_unix_socket(socket_path, socket_backlog=None):
+    from os.path import exists
+    from os import remove
     from socket import socket, AF_UNIX
     
     if socket_backlog is None:
         socket_backlog = 5
     
     socket = socket(AF_UNIX)
+    if exists(socket_path):
+        remove(socket_path)
     socket.bind(socket_path)
     socket.listen(socket_backlog)
     
