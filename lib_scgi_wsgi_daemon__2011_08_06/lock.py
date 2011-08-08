@@ -27,7 +27,7 @@ class FileLockError(Exception):
 class NBLockError(Exception):
     pass
 
-def new_lock_fd(self, path, ex=None, nb=None):
+def new_lock_fd(path, ex=None, nb=None):
     from fcntl import flock, LOCK_SH, LOCK_EX, LOCK_NB
     
     if ex is None:

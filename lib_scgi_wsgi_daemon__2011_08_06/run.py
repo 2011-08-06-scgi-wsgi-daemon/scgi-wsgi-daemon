@@ -19,7 +19,7 @@ from __future__ import absolute_import
 assert unicode is not str
 
 def run(app,
-            socket=None
+            socket=None,
             socket_path=None,
             lock_path=None,
             pid_path=None,
@@ -27,7 +27,7 @@ def run(app,
             use_daemonize=None,
             inactive_guard=None,
             inactive_quit_time=None,
-            loop_idle=None
+            loop_idle=None,
             loop_quit=None,
         ):
     from .scgi_wsgi_server import ScgiWsgiServer
