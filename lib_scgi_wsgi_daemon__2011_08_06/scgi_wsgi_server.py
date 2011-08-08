@@ -76,7 +76,7 @@ class ScgiWsgiServer(object):
                             '<p><input type="submit" /></p>' \
                         '</form>' \
                         '<hr />' \
-                        '<pre>{environ}</pre>' \
+                        '<pre>{environ!r}</pre>' \
                         '<hr />' \
                         '<pre>{upload}</pre>' \
                         '<hr />' \
@@ -84,7 +84,7 @@ class ScgiWsgiServer(object):
                 '</html>' \
                 .format( # DEBUG ONLY
                     environ=environ,
-                    upload=upload_content,
+                    upload=upload_content.decode('utf-8', 'replace'),
                 )
         data = '200 OK\r\n' \
                 'Content-Type: text/html;charset=utf-8\r\n' \
