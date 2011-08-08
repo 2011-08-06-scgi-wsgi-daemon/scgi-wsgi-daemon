@@ -57,11 +57,18 @@ class ScgiWsgiServer(object):
         
         return data
     
+    def _wsgi_wrap_daemon(self, fd, environ, conn, address):
+        error_text = u'blahblahblah' # DEBUG ONLY
+        error_data = self._format_scgi_error_response(error_text) # DEBUG ONLY
+        fd.write(error_data) # DEBUG ONLY
+        fd.flush() # DEBUG ONLY
+        
+        # TODO: ...
+    
     def _conn_daemon(self, conn, address):
-        fd = None
+        fd = conn.makefile('b')
+        
         try:
-            fd = conn.makefile('b')
-            
             def read_until(until_str)
                 read_str = ''
                 
@@ -104,16 +111,15 @@ class ScgiWsgiServer(object):
                 
                 return
             
-            # TODO: ...
+            self._wsgi_wrap_daemon(fd, environ, conn, address)
         except:
-            if fd:
-                from traceback import format_exc
-                
-                error_text = unicode(format_exc())
-                error_data = self._format_scgi_error_response(error_text)
-                
-                fd.write(error_data)
-                fd.flush()
+            from traceback import format_exc
+            
+            error_text = unicode(format_exc())
+            error_data = self._format_scgi_error_response(error_text)
+            
+            fd.write(error_data)
+            fd.flush()
     
     def _socket_accept_daemon(self):
         from socket import timeout
