@@ -22,7 +22,10 @@ def start_daemon(loop_idle, target, *args, **kwargs):
     def start_thread():
         from threading import Thread
         
-        thread = Thread(target=target, *args, **kwargs)
+        thread_args = args if args is not None else ()
+        thread_kwargs = kwargs if kwargs is not None else {}
+        
+        thread = Thread(target=target, args=thread_args, kwargs=thread_kwargs)
         thread.daemon = True
         thread.start()
     
