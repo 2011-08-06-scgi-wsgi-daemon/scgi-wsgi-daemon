@@ -18,6 +18,6 @@
 from __future__ import absolute_import
 assert unicode is not str
 
-from lib_scgi_wsgi_daemon__2011_08_06.scgi_wsgi_daemon \
+from lib_scgi_wsgi_daemon__2011_08_06.scgi_wsgi_server \
         import ScgiWsgiServer
 from lib_scgi_wsgi_daemon__2011_08_06.run import run
