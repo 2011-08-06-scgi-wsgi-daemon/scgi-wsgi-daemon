@@ -18,7 +18,7 @@ if __name__ == '__main__':
     
     run(app,
             socket_path=join(dirname(__file__), 'test-site', 'scgi.sock'),
-            lock_path=join(dirname(__file__), 'test-site', 'scgi.lock')
-            pid_path=join(dirname(__file__), 'test-site', 'scgi.pid')
+            lock_path=join(dirname(__file__), 'test-site', 'scgi.lock'),
+            pid_path=join(dirname(__file__), 'test-site', 'scgi.pid'),
             use_daemonize=True,
             inactive_quit_time=1000.0)
