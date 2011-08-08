@@ -44,7 +44,7 @@ def run(app,
         try:
             lock = new_lock_fd(lock_path, ex=True, nb=True)
         except NBLockError:
-            from os import stderr
+            from sys import stderr
             safe_print(u'Another scgi-wsgi-daemon is already running', file=stderr)
             exit(1)
     
