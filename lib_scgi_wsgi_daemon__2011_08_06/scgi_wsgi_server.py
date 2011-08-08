@@ -65,10 +65,30 @@ class ScgiWsgiServer(object):
         
         return data
     
-    def _wsgi_wrap_daemon(self, fd, environ, conn, address):
-        error_text = u'blahblahblah' # DEBUG ONLY
-        error_data = self._format_scgi_error_response(error_text) # DEBUG ONLY
-        fd.write(error_data) # DEBUG ONLY
+    def _wsgi_wrap_daemon(self, fd, environ, upload_content, conn, address):
+        text = u'<!DOCTYPE html>\n' \
+                '<html>' \
+                    '<body>' \
+                        '<form method="post" enctype="multipart/form-data">' \
+                            '<input type="file" name="file" />' \
+                            '<input type="submit">' \
+                        '</form>' \
+                        '<hr />' \
+                        '<pre>{environ}</pre>' \
+                        '<hr />' \
+                        '<pre>{upload}</pre>' \
+                        '<hr />' \
+                    '</body>' \
+                '</html>' \
+                .format( # DEBUG ONLY
+                    environ=environ,
+                    upload=upload_content,
+                )
+        data = '200 OK\r\n' \
+                'Content-Type: text/html;charset=utf-8\r\n' \
+                '\r\n' + \
+                text.encode('utf-8', 'replace')
+        fd.write(data) # DEBUG ONLY
         fd.flush() # DEBUG ONLY
         
         # TODO: ...
@@ -119,7 +139,7 @@ class ScgiWsgiServer(object):
                 
                 return
             
-            self._wsgi_wrap_daemon(fd, environ, conn, address)
+            self._wsgi_wrap_daemon(fd, environ, upload_content, conn, address)
         except:
             from traceback import format_exc
             
