@@ -70,8 +70,10 @@ class ScgiWsgiServer(object):
                 '<html>' \
                     '<body>' \
                         '<form method="post" enctype="multipart/form-data">' \
-                            '<input type="file" name="file" />' \
-                            '<input type="submit">' \
+                            '<p><input name="param"></p>' \
+                            '<p><input type="file" name="file" /></p>' \
+                            '<p><input name="param1"></p>' \
+                            '<p><input type="submit"></p>' \
                         '</form>' \
                         '<hr />' \
                         '<pre>{environ}</pre>' \
