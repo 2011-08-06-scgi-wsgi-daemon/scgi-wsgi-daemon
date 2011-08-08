@@ -30,7 +30,7 @@ class InactiveGuard(object):
         from time import sleep
         
         sleep(self._quit_time_len / 10.0)
-        loop_idle(self._timeout)
+        self._loop_idle(self._timeout)
     
     def _timeout(self):
         if self._is_started:
@@ -38,7 +38,7 @@ class InactiveGuard(object):
             from .daemon import start_daemon
             
             if abs(time() - self._time) < self._quit_time_len:
-                start_daemon(loop_idle, self._sleep_daemon)
+                start_daemon(self._loop_idle, self._sleep_daemon)
             else:
                 self.stop()
                 self._loop_quit()
@@ -55,7 +55,7 @@ class InactiveGuard(object):
             from .daemon import start_daemon
             
             self._is_started = True
-            start_daemon(loop_idle, self._sleep_daemon)
+            start_daemon(self._loop_idle, self._sleep_daemon)
     
     def stop(self):
         self._is_started = False
