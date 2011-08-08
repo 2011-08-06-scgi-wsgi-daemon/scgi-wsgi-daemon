@@ -52,7 +52,7 @@ class ScgiWsgiServer(object):
     def _format_scgi_error_response(self, text):
         data = '500 Internal Server Error\r\n' \
                 'Content-Type: text/plain;charset=utf-8\r\n' \
-                '\r\n' \
+                '\r\n' + \
                 text.encode('utf-8', 'replace')
         
         return data
@@ -69,7 +69,7 @@ class ScgiWsgiServer(object):
         fd = conn.makefile('b')
         
         try:
-            def read_until(until_str)
+            def read_until(until_str):
                 read_str = ''
                 
                 while True:
