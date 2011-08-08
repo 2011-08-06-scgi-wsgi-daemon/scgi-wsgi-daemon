@@ -20,7 +20,7 @@ assert unicode is not str
 
 class Loop(object):
     def __init__(self):
-        from queue import Queue
+        from Queue import Queue
         
         self._queue = Queue()
     

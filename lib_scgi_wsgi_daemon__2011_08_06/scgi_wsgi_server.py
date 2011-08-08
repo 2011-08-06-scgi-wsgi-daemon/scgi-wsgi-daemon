@@ -38,7 +38,7 @@ class ScgiWsgiServer(object):
             
             inactive_guard = InactiveGuard(
                     loop_idle, loop_quit, inactive_quit_time)
-            
+        
         self._loop_idle = loop_idle
         self._app = app
         self._socket = socket
@@ -48,6 +48,14 @@ class ScgiWsgiServer(object):
     def _inactive_guard_event(self):
         if self._inactive_guard is not None:
             self._inactive_guard.event()
+    
+    def _inactive_guard_start(self):
+        if self._inactive_guard is not None:
+            self._inactive_guard.start()
+    
+    def _inactive_guard_stop(self):
+        if self._inactive_guard is not None:
+            self._inactive_guard.stop()
     
     def _format_scgi_error_response(self, text):
         data = '500 Internal Server Error\r\n' \
@@ -140,19 +148,19 @@ class ScgiWsgiServer(object):
                 self._inactive_guard_event()
                 
                 conn, address = accept_result
-                start_daemon(self.loop_idle, self._conn_daemon, conn, address)
+                start_daemon(self._loop_idle, self._conn_daemon, conn, address)
             
-            start_daemon(self.loop_idle, self._socket_accept_daemon)
+            start_daemon(self._loop_idle, self._socket_accept_daemon)
     
     def start(self):
         if not self._is_started:
             from .daemon import start_daemon
             
             self._is_started = True
-            self._inactive_guard.start()
+            self._inactive_guard_start()
             
-            start_daemon(self.loop_idle, self._socket_accept_daemon)
+            start_daemon(self._loop_idle, self._socket_accept_daemon)
     
     def stop(self):
         self._is_started = False
-        self._inactive_guard.stop()
+        self._inactive_guard_stop()
