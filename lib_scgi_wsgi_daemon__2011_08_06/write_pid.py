@@ -21,13 +21,14 @@ assert unicode is not str
 def write_pid(path):
     from os import remove, getpid
     from fcntl import flock, LOCK_EX
+    from atexit import register as atexit_register
     
     def clean_pid():
         with open(path, 'w') as fd:
             flock(fd, LOCK_EX)
-        remove(pid_file)
-    atexit.register(clean_pid)
+        remove(path)
+    atexit_register(clean_pid)
     
     with open(path, 'w') as fd:
         flock(fd, LOCK_EX)
-        pid_fd.write(bytes(getpid()))
+        fd.write(bytes(getpid()))
