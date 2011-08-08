@@ -60,6 +60,8 @@ def run(app,
         
         safe_print(u'Daemonize...')
         daemonize()
+    else:
+        safe_print(u'Listening...')
     
     if pid_path is not None:
         from .write_pid import write_pid
