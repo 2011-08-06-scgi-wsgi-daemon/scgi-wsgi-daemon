@@ -33,12 +33,16 @@ def safe_print(*args, **kwargs):
         file = sys_stdout
     
     def safe_conv(value):
+        encoding = getattr(file, 'encoding', None)
+        if encoding is None:
+            encoding = 'utf-8'
+        
         if isinstance(value, bytes):
             safe_value = value
         elif isinstance(value, unicode):
-            safe_value = value.encode(file.encoding, 'replace')
+            safe_value = value.encode(encoding, 'replace')
         else:
-            safe_value = unicode(value).encode(file.encoding, 'replace')
+            safe_value = unicode(value).encode(encoding, 'replace')
         
         return safe_value
     
