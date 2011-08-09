@@ -67,10 +67,14 @@ class ScgiWsgiServer(object):
         return data
     
     def _wsgi_wrap_daemon(self, fd, environ, upload_content, conn, address):
+        assert environ.get('REQUEST_METHOD')
         if 'SCRIPT_NAME' not in environ:
             environ['SCRIPT_NAME'] = ''
         if 'PATH_INFO' not in environ:
             environ['PATH_INFO'] = ''
+        assert environ.get('SERVER_NAME')
+        assert environ.get('SERVER_PORT')
+        
         environ['scgi_wsgi_daemon.loop_idle'] = self._loop_idle
         environ['scgi_wsgi_daemon.loop_quit'] = self._loop_quit
         environ['scgi_wsgi_daemon.inactive_guard'] = self._inactive_guard
@@ -79,7 +83,7 @@ class ScgiWsgiServer(object):
         environ['scgi_wsgi_daemon.conn'] = conn
         environ['scgi_wsgi_daemon.address'] = address
         
-        
+        # DEBUG ONLY:
         from cgi import escape # DEBUG ONLY
         text = u'<!DOCTYPE html>\n' \
                 '<html>' \
