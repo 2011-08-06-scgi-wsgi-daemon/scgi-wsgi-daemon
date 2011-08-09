@@ -40,10 +40,10 @@ class ScgiWsgiServer(object):
                     loop_idle, loop_quit, inactive_quit_time)
         
         self._loop_idle = loop_idle
-        self._loop_quit = loop_quit
         self._app = app
         self._socket = socket
         self._inactive_guard = inactive_guard
+        self._loop_quit = loop_quit
         self._is_started = False
     
     def _inactive_guard_event(self):
@@ -95,39 +95,58 @@ class ScgiWsgiServer(object):
         environ['scgi_wsgi_daemon.conn'] = conn
         environ['scgi_wsgi_daemon.address'] = address
         
-        # DEBUG ONLY:
-        from cgi import escape # DEBUG ONLY
-        text = u'<!DOCTYPE html>\n' \
-                '<html>' \
-                    '<body>' \
-                        '<form method="post" enctype="multipart/form-data">' \
-                            '<p><input name="param" /></p>' \
-                            '<p><input type="file" name="file" /></p>' \
-                            '<p><input name="param1[]" /></p>' \
-                            '<p><input type="file" name="file1[]" /></p>' \
-                            '<p><input name="param2[][]" /></p>' \
-                            '<p><input type="file" name="file2[][]" /></p>' \
-                            '<p><input type="submit" /></p>' \
-                        '</form>' \
-                        '<hr />' \
-                        '<pre>{environ}</pre>' \
-                        '<hr />' \
-                        '<pre>{upload}</pre>' \
-                        '<hr />' \
-                    '</body>' \
-                '</html>' \
-                .format( # DEBUG ONLY
-                    environ=escape(unicode(repr(environ))),
-                    upload=escape(upload_content.decode('utf-8', 'replace')),
-                )
-        data = 'Status: 200 OK\r\n' \
-                'Content-Type: text/html;charset=utf-8\r\n' \
-                '\r\n' + \
-                text.encode('utf-8', 'replace')
-        fd.write(data) # DEBUG ONLY
-        fd.flush() # DEBUG ONLY
+        headers_set = []
+        headers_sent = []
         
-        # TODO: ...
+        def write(data):
+            assert headers_set, u'write() before start_response()'
+            
+            if not headers_sent:
+                status, response_headers = headers_sent[:] = headers_set
+                
+                fd.write('Status: ' + status + '\r\n')
+                for header_name, header_value in response_headers:
+                    fd.write(header_name + ': ' + header_value + '\r\n')
+                fd.write('\r\n')
+            
+            fd.write(data)
+            fd.flush()
+        
+        def start_response(status, response_headers, exc_info=None):
+            if exc_info is not None:
+                try:
+                    raise exc_info[0], exc_info[1], exc_info[2]
+                finally:
+                    exc_info = None
+            
+            assert not headers_set, u'Headers already set!'
+            
+            headers_set[:] = status, response_headers
+            
+            return write
+        
+        try:
+            result = self._app(environ, start_response)
+            try:
+                for data in result:
+                    if data:
+                        write(data)
+                if not headers_sent:
+                    write('')
+            finally:
+                if hasattr(result, 'close'):
+                    result.close()
+        except:
+            from traceback import format_exc
+            
+            error_text = unicode(format_exc())
+            data = error_text.encode('utf-8', 'replace')
+            
+            if not headers_sent:
+                headers_set[:] = \
+                        'Status: 500 Internal Server Error', \
+                        (('Content-Type', 'text/plain;charset=utf-8'),)
+            write(data)
     
     def _conn_daemon(self, conn, address):
         fd = conn.makefile('b')
@@ -156,7 +175,9 @@ class ScgiWsgiServer(object):
             headers_sep = fd.read(1)
             assert headers_sep == ','
             
-            environ_list = headers_buf.split('\0')[:-1]
+            environ_list = headers_buf.split('\0')
+            assert not environ_list[-1]
+            environ_list = environ_list[:-1]
             environ = {}
             while environ_list:
                 key = environ_list.pop(0)
