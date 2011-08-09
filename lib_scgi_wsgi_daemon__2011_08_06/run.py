@@ -29,6 +29,7 @@ def run(app,
             inactive_quit_time=None,
             loop_idle=None,
             loop_quit=None,
+            quiet=None,
         ):
     from .safe_print import safe_print
     from .scgi_wsgi_server import ScgiWsgiServer
@@ -37,6 +38,8 @@ def run(app,
     
     if use_daemonize is None:
         use_daemonize = False
+    if quiet is None:
+        quiet = False
     
     if lock_path is not None:
         from .lock import new_lock_fd, NBLockError
@@ -52,16 +55,19 @@ def run(app,
     if socket is None:
         from .unix_socket import new_unix_socket
         
-        safe_print(u'Initializing UNIX socket...')
+        if not quiet:
+            safe_print(u'Initializing UNIX socket...')
         socket = new_unix_socket(socket_path, socket_backlog=socket_backlog)
     
     if use_daemonize:
         from .daemonize import daemonize
         
-        safe_print(u'Daemonize...')
+        if not quiet:
+            safe_print(u'Daemonize...')
         daemonize()
     else:
-        safe_print(u'Listening...')
+        if not quiet:
+            safe_print(u'Listening...')
     
     if pid_path is not None:
         from .write_pid import write_pid
