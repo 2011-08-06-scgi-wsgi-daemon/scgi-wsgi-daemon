@@ -7,4 +7,4 @@ that listening SCGI-socket
 Status
 ------
 
-Current status of project -- is *developing*
+Current status of project -- is *beta*
