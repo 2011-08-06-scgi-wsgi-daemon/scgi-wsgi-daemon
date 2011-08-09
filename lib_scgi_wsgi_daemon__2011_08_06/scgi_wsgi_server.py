@@ -58,7 +58,7 @@ class ScgiWsgiServer(object):
             self._inactive_guard.stop()
     
     def _format_scgi_error_response(self, text):
-        data = '500 Internal Server Error\r\n' \
+        data = 'Status: 500 Internal Server Error\r\n' \
                 'Content-Type: text/plain;charset=utf-8\r\n' \
                 '\r\n' + \
                 text.encode('utf-8', 'replace')
@@ -89,7 +89,7 @@ class ScgiWsgiServer(object):
                     environ=environ,
                     upload=upload_content.decode('utf-8', 'replace'),
                 )
-        data = '200 OK\r\n' \
+        data = 'Status: 200 OK\r\n' \
                 'Content-Type: text/html;charset=utf-8\r\n' \
                 '\r\n' + \
                 text.encode('utf-8', 'replace')
