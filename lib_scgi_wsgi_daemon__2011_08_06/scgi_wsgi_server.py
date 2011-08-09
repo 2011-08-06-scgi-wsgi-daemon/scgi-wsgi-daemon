@@ -67,6 +67,9 @@ class ScgiWsgiServer(object):
         return data
     
     def _wsgi_wrap_daemon(self, fd, environ, upload_content, conn, address):
+        from cStringIO import StringIO
+        from sys import stderr
+        
         assert environ.get('REQUEST_METHOD')
         if 'SCRIPT_NAME' not in environ:
             environ['SCRIPT_NAME'] = ''
@@ -74,6 +77,15 @@ class ScgiWsgiServer(object):
             environ['PATH_INFO'] = ''
         assert environ.get('SERVER_NAME')
         assert environ.get('SERVER_PORT')
+        
+        environ['wsgi.version'] = (1, 0)
+        environ['wsgi.url_scheme'] = 'https' \
+                if environ.get('HTTPS', 'off') in ('on', '1') else 'http'
+        environ['wsgi.input'] = StringIO(upload_content)
+        environ['wsgi.errors'] = stderr
+        environ['wsgi.multithread'] = True
+        environ['wsgi.multiprocess'] = False
+        environ['wsgi.run_once'] = False
         
         environ['scgi_wsgi_daemon.loop_idle'] = self._loop_idle
         environ['scgi_wsgi_daemon.loop_quit'] = self._loop_quit
