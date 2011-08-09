@@ -40,6 +40,7 @@ class ScgiWsgiServer(object):
                     loop_idle, loop_quit, inactive_quit_time)
         
         self._loop_idle = loop_idle
+        self._loop_quit = loop_quit
         self._app = app
         self._socket = socket
         self._inactive_guard = inactive_guard
@@ -66,6 +67,20 @@ class ScgiWsgiServer(object):
         return data
     
     def _wsgi_wrap_daemon(self, fd, environ, upload_content, conn, address):
+        if 'SCRIPT_NAME' not in environ:
+            environ['SCRIPT_NAME'] = ''
+        if 'PATH_INFO' not in environ:
+            environ['PATH_INFO'] = ''
+        environ['scgi_wsgi_daemon.loop_idle'] = self._loop_idle
+        environ['scgi_wsgi_daemon.loop_quit'] = self._loop_quit
+        environ['scgi_wsgi_daemon.inactive_guard'] = self._inactive_guard
+        environ['scgi_wsgi_daemon.fd'] = fd
+        environ['scgi_wsgi_daemon.upload_content'] = upload_content
+        environ['scgi_wsgi_daemon.conn'] = conn
+        environ['scgi_wsgi_daemon.address'] = address
+        
+        
+        from cgi import escape # DEBUG ONLY
         text = u'<!DOCTYPE html>\n' \
                 '<html>' \
                     '<body>' \
@@ -79,15 +94,15 @@ class ScgiWsgiServer(object):
                             '<p><input type="submit" /></p>' \
                         '</form>' \
                         '<hr />' \
-                        '<pre>{environ!r}</pre>' \
+                        '<pre>{environ}</pre>' \
                         '<hr />' \
                         '<pre>{upload}</pre>' \
                         '<hr />' \
                     '</body>' \
                 '</html>' \
                 .format( # DEBUG ONLY
-                    environ=environ,
-                    upload=upload_content.decode('utf-8', 'replace'),
+                    environ=escape(unicode(repr(environ))),
+                    upload=escape(upload_content.decode('utf-8', 'replace')),
                 )
         data = 'Status: 200 OK\r\n' \
                 'Content-Type: text/html;charset=utf-8\r\n' \
@@ -130,8 +145,8 @@ class ScgiWsgiServer(object):
             while environ_list:
                 key = environ_list.pop(0)
                 value = environ_list.pop(0)
-                environ['HTTP_' + key] = value
-            content_length = int(environ['HTTP_CONTENT_LENGTH'])
+                environ[key] = value
+            content_length = int(environ['CONTENT_LENGTH'])
             
             if content_length <= self._UPLOAD_CONTENT_LENGTH_LIMIT:
                 upload_content = fd.read(content_length)
