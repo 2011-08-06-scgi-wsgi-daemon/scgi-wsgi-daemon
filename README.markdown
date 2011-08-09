@@ -14,4 +14,4 @@ Recommended site-packages:
 Status
 ------
 
-Current status of project -- is *developing*
+Current status of project -- is *beta*
