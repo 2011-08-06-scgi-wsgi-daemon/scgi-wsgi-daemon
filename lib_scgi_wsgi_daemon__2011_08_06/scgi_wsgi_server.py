@@ -1,6 +1,6 @@
 # -*- mode: python; coding: utf-8 -*-
 #
-# Copyright 2011 Andrej A Antonov <polymorphm@qmail.com>
+# Copyright 2011, 2012 Andrej A Antonov <polymorphm@qmail.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
@@ -134,6 +134,9 @@ class ScgiWsgiServer(object):
                 if not headers_sent:
                     write('')
             finally:
+                fd.close()
+                conn.close()
+                
                 if hasattr(result, 'close'):
                     result.close()
         except:
@@ -209,7 +212,6 @@ class ScgiWsgiServer(object):
     def _socket_accept_daemon(self):
         from socket import timeout
         
-        self._socket.settimeout(30.0)
         try:
             conn, address = self._socket.accept()
         except timeout:
