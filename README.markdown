@@ -4,10 +4,10 @@ scgi-wsgi-daemon
 `scgi-wsgi-daemon` -- is Python library for creating WSGI-daemon,
 that listening SCGI-socket
 
-Requirements
-------------
+Site-packages
+-------------
 
-Required site-packages:
+Recommended site-packages:
 
    * `tornado` (see <http://tornadoweb.org>)
 

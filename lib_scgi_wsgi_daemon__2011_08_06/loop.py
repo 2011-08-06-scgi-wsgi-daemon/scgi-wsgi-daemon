@@ -18,7 +18,9 @@
 from __future__ import absolute_import
 assert unicode is not str
 
-class Loop(object):
+import functools
+
+class QueueLoop(object):
     def __init__(self):
         from Queue import Queue
         
@@ -41,3 +43,26 @@ class Loop(object):
     
     def quit(self):
         self._queue.put(None)
+
+try:
+    import tornado.ioloop
+except ImportError:
+    TornadoLoop = None
+else:
+    class TornadoLoop(object):
+        def idle(self, target, *args, **kwargs):
+            io_loop = tornado.ioloop.IOLoop.instance()
+            io_loop.add_callback(functools.partial(target, *args, **kwargs))
+        
+        def run(self):
+            io_loop = tornado.ioloop.IOLoop.instance()
+            io_loop.start()
+        
+        def quit(self):
+            io_loop = tornado.ioloop.IOLoop.instance()
+            io_loop.stop()
+
+if TornadoLoop is not None:
+    Loop = TornadoLoop
+else:
+    Loop = QueueLoop
